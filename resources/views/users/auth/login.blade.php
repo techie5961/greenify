@@ -1,7 +1,7 @@
  @extends('layout.users.auth')
  @section('title')
      Login
- @endsection
+ @endsection 
  @section('main')
      <section class="section justify-center column w-full p-10">
      <img style="width:150px;" src="{{ asset('images/logo.png') }}" alt="LOGO">

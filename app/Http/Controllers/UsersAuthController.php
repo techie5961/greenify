@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UsersAuthController extends Controller
 {
@@ -13,7 +14,15 @@ class UsersAuthController extends Controller
     }
       // register
     public function Register(){
-     return view('users.auth.register');
+      $ref='';
+      if(request()->has('ref')){
+        if(DB::table('users')->where('username',request()->input('ref'))->count() > 0){
+          $ref=request()->input('ref');
+        }
+      }
+     return view('users.auth.register',[
+      'ref' => $ref
+     ]);
      
     }
 }

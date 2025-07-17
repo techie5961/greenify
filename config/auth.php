@@ -43,9 +43,14 @@ return [
         'users' => [
             'driver' => 'session',
             'provider' => 'user'
-        ]
+        ],
+        'admins' => [
+        'driver' => 'session',
+        'provider' => 'admin'
     ],
 
+    ],
+    
     /*
     |--------------------------------------------------------------------------
     | User Providers
@@ -71,6 +76,10 @@ return [
         'user' => [
             'driver' => 'database',
             'table' => 'users'
+        ],
+        'admin' => [
+            'driver' => 'database',
+            'table' => 'admins'
         ]
 
         // 'users' => [

@@ -1,11 +1,14 @@
 body{
     font-family:'poppins';
-    scrollbar-width: none;
     font-size:0.8rem;
 }
-*{
-    scrollbar-width: none;
+body.loading{
+    overflow:hidden;
 }
+body.loading .ball-loading{
+    display:flex;
+}
+
 .ball-loading{
     position:fixed;
     top:0;
@@ -52,6 +55,7 @@ body{
    clip-path:inset(0 round 0);
    padding-bottom:10px;
    animation:trans-in-from-right 0.2s linear forwards;
+   z-index:var(--z-index-highest);
     
 }
 .notify.success{

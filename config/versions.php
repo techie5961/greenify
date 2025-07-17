@@ -1,8 +1,8 @@
 <?php
 return [
-    'vite_version' => 1.4,
-    'styles_version' => 1.4,
-    'scripts_version' => 1.3
+    'vite_version' => 8.5,
+    'styles_version' => 1.7,
+    'scripts_version' => 1.8
 ];
 
 
