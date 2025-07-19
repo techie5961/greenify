@@ -36,12 +36,13 @@ Route::get('purchased',function(){
         
 });
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
 
 Route::middleware([UserLoggedIn::class])->group(function(){
     Route::get('login',[
+    UsersAuthController::class,'Login'
+]);
+ Route::get('/',[
     UsersAuthController::class,'Login'
 ]);
 Route::get('register',[
