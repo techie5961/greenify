@@ -19,7 +19,12 @@ use App\Http\Middleware\AdminLoggedIn;
 use App\Http\Middleware\AdminsAuthChecker;
 
 
-
+Route::get('flutterwave',[
+    UsersDashboardController::class,'Flutterwave'
+]);
+Route::get('ip',[
+    UsersDashboardController::class,'Ip'
+]);
 Route::middleware([ DailyIncomeMiddleware::class ])->group(function(){
 Route::get('time',function(){
     $time=Carbon::now()->format('d-M-Y H:i:s');
@@ -93,6 +98,9 @@ Route::prefix('users')->group(function(){
     ]);
     Route::get('referrals',[
         UsersDashboardController::class,'Referrals'
+    ]);
+    Route::get('daily/check/in',[
+        UsersGetRequestController::class,'CheckIn'
     ]);
     
 

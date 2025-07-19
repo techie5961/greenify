@@ -66,6 +66,11 @@
             </div>
           </div>
         </section>
+         <section onclick="HidePopUp()" class="popup">
+            <div onclick="StopPropagation(event)" class="child">
+               @yield('popup_child')
+            </div>
+        </section>
     </main>
     <footer>
       <section class="navs clip-1000 row space-between br-1000">

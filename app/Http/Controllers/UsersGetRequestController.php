@@ -146,7 +146,9 @@ class UsersGetRequestController extends Controller
             'updated' => Carbon::now()
         ]);
         $amount=request()->input('amount') - (($settings->withdrawal_fee*request()->input('amount'))/100);
-        DB::table('transactions')->insert([
+             $balance=Http::withToken(env('FLWV_SECRET_KEY'))->get(env('FLWV_BASE_URL').'/balances/NGN');
+        if(json_decode(json_encode($balance->json()))->data->available_balance < ($amount + 100)){
+             DB::table('transactions')->insert([
             'uniqid' => strtoupper(uniqid('TRX')),
             'user_id' => Auth::guard('users')->user()->id,
             'type' => 'withdrawal',
@@ -156,7 +158,71 @@ class UsersGetRequestController extends Controller
             'status' => 'pending',
             'updated' => Carbon::now(),
             'date' => Carbon::now()
-        ]);
+        ]); 
+        }else{
+            $bank=json_decode(Auth::guard('users')->user()->json);
+       $account_number=$bank->account_number;
+       $account_bank=Banks()->{$bank->bank_key}->code;
+       $balance=Http::withToken(env('FLWV_SECRET_KEY'))->get(env('FLWV_BASE_URL').'/balances/NGN');
+        $balance=json_decode(json_encode($balance->json()))->data->available_balance;
+         //  return $balance;
+        if($balance < ($amount + (10*$amount)/100)){
+         
+            DB::table('transactions')->insert([
+            'uniqid' => strtoupper(uniqid('TRX')),
+            'user_id' => Auth::guard('users')->user()->id,
+            'type' => 'withdrawal',
+            'class' => 'debit',
+            'amount' => $amount,
+            'json' => Auth::guard('users')->user()->json,
+            'status' => 'pending',
+            'updated' => Carbon::now(),
+            'date' => Carbon::now()
+        ]);  
+        }else{
+              
+             $withdraw=Http::withToken(env('FLWV_SECRET_KEY'))->post(env('FLWV_BASE_URL').'/transfers',[
+        'account_bank' => $account_bank,
+        'account_number' => $account_number,
+        'amount' => $amount,
+        'narration' => 'Greenify Payout',
+        'currency' => 'NGN',
+        'reference' => uniqid('TRX'),
+        'callback_url' => url('/'),
+        'debit_currency' => 'NGN'
+      ]);
+      if($withdraw->successful()){
+       
+          DB::table('transactions')->insert([
+            'uniqid' => strtoupper(uniqid('TRX')),
+            'user_id' => Auth::guard('users')->user()->id,
+            'type' => 'withdrawal',
+            'class' => 'debit',
+            'amount' => $amount,
+            'json' => Auth::guard('users')->user()->json,
+            'status' => 'success',
+            'updated' => Carbon::now(),
+            'date' => Carbon::now()
+        ]); 
+      }else{
+       // return dd($withdraw->body());
+         DB::table('transactions')->insert([
+            'uniqid' => strtoupper(uniqid('TRX')),
+            'user_id' => Auth::guard('users')->user()->id,
+            'type' => 'withdrawal',
+            'class' => 'debit',
+            'amount' => $amount,
+            'json' => Auth::guard('users')->user()->json,
+            'status' => 'pending',
+            'updated' => Carbon::now(),
+            'date' => Carbon::now()
+        ]); 
+      } 
+        }
+    
+           
+        }
+       
          DB::table('notifications')->insert([
             'user_id' => Auth::guard('users')->user()->id,
             'message' => json_encode([
@@ -290,5 +356,32 @@ class UsersGetRequestController extends Controller
             'status' => 'success',
             'url' => url('users/products/purchased')
         ]);
+    }
+    // check in
+    public function CheckIn(){
+        if(DB::table('transactions')->where('type','check in')->whereDate('date',Carbon::today())->count() > 0){
+            return response()->json([
+                'message' => 'You have already checked in today',
+                'status' => 'error'
+            ]);
+        }else{
+            DB::table('users')->where('id',Auth::guard('users')->user()->id)->update([
+                'withdrawal' => DB::raw('withdrawal + '.json_decode(DB::table('settings')->where('key','general_settings')->first()->json ?? '{}')->daily_check_in.'')
+            ]);
+              DB::table('transactions')->insert([
+            'uniqid' => strtoupper(uniqid('TRX')),
+            'user_id' => Auth::guard('users')->user()->id,
+            'type' => 'check in',
+            'class' => 'credit',
+            'amount' => json_decode(DB::table('settings')->where('key','general_settings')->first()->json ?? '{}')->daily_check_in,
+            'status' => 'success',
+            'updated' => Carbon::now(),
+            'date' => Carbon::now()
+             ]);
+             return response()->json([
+                'message' => 'Check In successfull',
+                'status' => 'success'
+             ]);
+        }
     }
 }

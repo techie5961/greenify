@@ -99,7 +99,7 @@
                 <div class="h-30 gradient perfect-square circle text-b c-black column justify-center">4</div>
                 <div class="column text-start align-start">
                     <b class="c-primary">Level 2 Commission</b>
-                    <span>Your friend refers another user and he/she purchases an asset,you instantly earn 10% commission which can be withdrawn anytime.I.e your friends referral purchases an asset worth &#8358;100,000.00 your friend earns &#8358;{{ number_format(($referral_settings->first_level*100000)/100,2) }} and you earn &#8358;{{ number_format(($referral_settings->second_level*100000)/100,2) }}</span>
+                    <span>Your friend refers another user and he/she purchases an asset,you instantly earn {{ $referral_settings->second_level }}% commission which can be withdrawn anytime.I.e your friends referral purchases an asset worth &#8358;100,000.00 your friend earns &#8358;{{ number_format(($referral_settings->first_level*100000)/100,2) }} and you earn &#8358;{{ number_format(($referral_settings->second_level*100000)/100,2) }}</span>
                 </div>
             </div>
         </div>

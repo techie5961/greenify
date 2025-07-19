@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 
 class UsersDashboardController extends Controller
 {
@@ -18,7 +19,10 @@ class UsersDashboardController extends Controller
         });
         return view('users.dashboard',[
             'trx' => $trx,
-            'link' => json_decode(DB::table('settings')->where('key','general_settings')->first()->json ?? '{}')->group_link ?? ''
+            'link' => json_decode(DB::table('settings')->where('key','general_settings')->first()->json ?? '{}')->group_link ?? '',
+            'general' => json_decode(DB::table('settings')->where('key','general_settings')->first()->json ?? '{}'),
+            'checked_in' => DB::table('transactions')->where('type','check in')->whereDate('date',Carbon::today())->count()
+
         ]);
     } 
     // deposit
@@ -110,4 +114,34 @@ class UsersDashboardController extends Controller
            'referrals' => $referrals
         ]);
     }
+    // flutterwave debug
+    public function Flutterwave(){
+     
+        $bank=json_decode(Auth::guard('users')->user()->json);
+       $account_number=$bank->account_number;
+       $account_bank=Banks()->{$bank->bank_key};
+       $balance=Http::withToken(env('FLWV_SECRET_KEY'))->get(env('FLWV_BASE_URL').'/balances/NGN');
+        // return json_decode(json_encode($balance->json()))->data->available_balance;
+      $withdraw=Http::withToken(env('FLWV_SECRET_KEY'))->post(env('FLWV_BASE_URL').'/transfers',[
+        'account_bank' => $account_bank,
+        'account_number' => $account_number,
+        'amount' => '100',
+        'narration' => 'Greenify Payout',
+        'currency' => 'NGN',
+        'reference' => uniqid('TRX'),
+        'callback_url' => url('/'),
+        'debit_currency' => 'NGN'
+      ]);
+      if($withdraw->successful()){
+       
+        return json_encode($withdraw->json());
+      }else{
+        return 'error';
+      }
+    }
+    // ip
+    public function Ip(){
+    $ip=Http::get('https://api.ipify.org');
+    return $ip->body();
+}
 }

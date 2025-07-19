@@ -13,7 +13,12 @@
         <hr class="w-full gradient">
         <form action="{{ url()->to('admins/post/general/settings/process') }}" method="POST" onsubmit="PostRequest(event,this)" class="w-full column g-5">
           <input type="hidden" name="_token" class="input" value="{{ csrf_token() }}">
-            <label for="">Signup Bonus (&#8358;)</label>
+           <label for="">Daily Check-In (&#8358;)</label>
+            <div class="cont required">
+                <input value="{{ $general_settings->daily_check_in ?? '' }}" name="daily_check_in" placeholder="E.g 500" type="number" step="any" class="inp input">
+                <div class="prompt"><i>Required</i></div>
+            </div>
+          <label for="">Signup Bonus (&#8358;)</label>
             <div class="cont required">
                 <input value="{{ $general_settings->signup_bonus }}" name="signup_bonus" placeholder="E.g 500" type="number" step="any" class="inp input">
                 <div class="prompt"><i>Required</i></div>
@@ -21,11 +26,23 @@
             
             
            
-            <label for="">Platform Group Link</label>
+            <label for="">Whatsapp Group Link</label>
             <div class="cont required">
                 <input value="{{ $general_settings->group_link }}" name="group_link" placeholder="E.g https://site-group-link.com" type="url" class="inp input">
                 <div class="prompt"><i>Required</i></div>
             </div>
+            <label for="">Telegram Group Link</label>
+            <div class="cont required">
+                <input value="{{ $general_settings->popup_link ?? '' }}" name="popup_link" placeholder="E.g https://popup-link.com" type="url" class="inp input">
+                <div class="prompt"><i>Required</i></div>
+            </div>
+            <label for="">Popup Message</label>
+            <div class="cont h-200 required">
+            {{-- <input value="{{ $general_settings->group_link }}" name="group_link" placeholder="E.g https://site-group-link.com" type="url" class="inp input"> --}}
+               <textarea style="font-family: poppins" placeholder="Enter Popup Message" name="popup_message" id="" class="inp p-10 no-resize input">{!! $general_settings->popup_message ?? '' !!}</textarea>
+            <div class="prompt"><i>Required</i></div>
+            </div>
+            
             
             <button class="post"><div class="working">Loading....</div><div class="content">Update Settings</div></button>
         </form>
