@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Session;
 
 class UsersGetRequestController extends Controller
 {
@@ -16,10 +17,10 @@ class UsersGetRequestController extends Controller
         $ref=strtoupper(uniqid('TRX'));
         $payload=[
             'tx_ref' => $ref,
-            'amount' => (float) request()->input('amount'),
+            'amount' => request()->input('amount'),
             'currency' => 'NGN',
             'payment_options' => 'card,bank transfer',
-            'redirect_url' => url()->to('users/deposit/process/flutterwave/{'.$ref.'}'),
+            'redirect_url' => url()->to('users/deposit/process/flutterwave/'.$ref.''),
             'customer' => [
                 'email' => Auth::guard('users')->user()->email,
                 'name' => Auth::guard('users')->user()->name
@@ -30,7 +31,9 @@ class UsersGetRequestController extends Controller
                 'description' => 'Payment for Deposit Request'
             ]
         ];
+       // return json_encode($payload);
         $response=Http::withToken(env('FLWV_SECRET_KEY'))->post(env('FLWV_BASE_URL').'/payments',$payload)->json();
+       // return json_encode($response);
         if($response['status'] == 'success'){
              DB::table('notifications')->insert([
             'user_id' => Auth::guard('users')->user()->id,
@@ -45,10 +48,11 @@ class UsersGetRequestController extends Controller
             'updated' => Carbon::now(),
             'date' => Carbon::now()
         ]);
+        session::put('FLWV_PAY_URL',$response['data']['link']);
             return response()->json([
                 'message' => 'Payment Initiated success',
                 'status' => 'success',
-                'url' => $response['data']['link']
+                'url' => url('users/flutterwave/pay')
             ]);
         }else{
             return response()->json([
@@ -56,6 +60,10 @@ class UsersGetRequestController extends Controller
                 'status' => 'error'
             ]);
         }
+    }
+    // flutterwave pay
+    public function FlutterwavePay(){
+        return redirect(Session::pull('FLWV_PAY_URL'));
     }
     // complete flutterwave payment
     public function FlutterwaveProcess($uniqid){
@@ -105,6 +113,7 @@ class UsersGetRequestController extends Controller
         }
          return redirect()->to('users/dashboard');
         }
+        return redirect()->to('users/dashboard');
     }
     // auto verify
     public function AutoVerify(){

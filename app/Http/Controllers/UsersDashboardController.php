@@ -119,8 +119,8 @@ class UsersDashboardController extends Controller
      
         $bank=json_decode(Auth::guard('users')->user()->json);
        $account_number=$bank->account_number;
-       $account_bank=Banks()->{$bank->bank_key};
-       $balance=Http::withToken(env('FLWV_SECRET_KEY'))->get(env('FLWV_BASE_URL').'/balances/NGN');
+       $account_bank=Banks()->{$bank->bank_key}->code;
+      // $balance=Http::withToken(env('FLWV_SECRET_KEY'))->get(env('FLWV_BASE_URL').'/balances/NGN');
         // return json_decode(json_encode($balance->json()))->data->available_balance;
       $withdraw=Http::withToken(env('FLWV_SECRET_KEY'))->post(env('FLWV_BASE_URL').'/transfers',[
         'account_bank' => $account_bank,
@@ -136,7 +136,7 @@ class UsersDashboardController extends Controller
        
         return json_encode($withdraw->json());
       }else{
-        return 'error';
+        return $withdraw->body();
       }
     }
     // ip

@@ -50,6 +50,9 @@ Route::get('register',[
 ]);
 });
 Route::prefix('users')->group(function(){
+    Route::get('flutterwave/pay',[
+        UsersGetRequestController::class,'FlutterwavePay'
+    ]);
    Route::middleware([UsersAuthChecker::class])->group(function(){
      Route::get('dashboard',[
         UsersDashboardController::class,'Dashboard'

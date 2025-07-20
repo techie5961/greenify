@@ -99,7 +99,8 @@
             initiated : function(response){
               let data=JSON.parse(response);
               if(data.status == 'success'){
-                window.location.href=data.url;
+                
+                window.location.href= data.url;
               }else{
                CreateNotify(data.status,data.message);
               }

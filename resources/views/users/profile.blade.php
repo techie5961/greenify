@@ -39,9 +39,9 @@
         <span style="font-family:'cinzel decorative'" class="text-dim right-auto">Personal Information</span>
         <section class="bg-dim w-full max-500 column p-10 br-10">
             <span style="font-family:'cinzel decorative'">Full Name</span>
-            <span class="bottom-10">Abakpa David James</span>
+            <span class="bottom-10">{{ ucwords(Auth::guard('users')->user()->name) }}</span>
              <span style="font-family:'cinzel decorative'">Email Address</span>
-            <span class="bottom-10">techie@gmail.com</span>
+            <span class="bottom-10">{{ Auth::guard('users')->user()->email }}</span>
               <span style="font-family:'cinzel decorative'">Registration Date</span>
             <span class="bottom-10">{{ $reg_date }}</span>
             <hr>

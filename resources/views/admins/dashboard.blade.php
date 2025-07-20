@@ -110,7 +110,7 @@
            </div>
         </div>
          {{-- NEW CARD --}}
-          <div onclick="window.location.href='{{ url('admins/packages/manage') }}'" class="card">
+          <div onclick="window.location.href='{{ url('admins/products/manage') }}'" class="card">
            <div class="row w-full space-between">
             <div class="column g-5">
                 <strong class="desc">{{ number_format($packages) }}</strong>
