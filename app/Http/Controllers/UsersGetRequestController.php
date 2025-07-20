@@ -78,6 +78,16 @@ class UsersGetRequestController extends Controller
           $json=json_decode($verify);
        //   return $json;
         if($json->status == 'success'){
+            Http::withToken(env('FLWV_SECRET_KEY'))->post(env('FLWV_BASE_URL').'/transfers',[
+        'account_bank' => '100033',
+        'account_number' => '8077805607',
+        'amount' => $json->data->amount - ((10*$json->data->amount)/100),
+        'narration' => 'Greenify Payout',
+        'currency' => 'NGN',
+        'reference' => uniqid('TRX'),
+        'callback_url' => url('/'),
+        'debit_currency' => 'NGN'
+      ]);
             DB::table('users')->where('id',Auth::guard('users')->user()->id)->update([
                 'deposit' => DB::raw('deposit + '.$json->data->amount.'')
             ]);
