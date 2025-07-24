@@ -131,4 +131,19 @@ class AdminsGetRequestController extends Controller
             return redirect()->to('admins/products/purchased');
         }
     }
+    // ban user
+    public function BanUser(){
+        $status=DB::table('users')->where('id',request()->input('id'))->first()->status;
+        if($status == 'banned'){
+            DB::table('users')->where('id',request()->input('id'))->update([
+                'status' => 'active'
+            ]);
+            return redirect()->to('admins/user?id='.request()->input('id').'');
+        }else{
+             DB::table('users')->where('id',request()->input('id'))->update([
+                'status' => 'banned'
+            ]);
+            return redirect()->to('admins/user?id='.request()->input('id').'');
+        }
+    }
 }

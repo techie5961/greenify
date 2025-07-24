@@ -106,6 +106,9 @@ Route::prefix('users')->group(function(){
     Route::get('daily/check/in',[
         UsersGetRequestController::class,'CheckIn'
     ]);
+    Route::get('deposit/pay',[
+        UsersDashboardController::class,"DepositPay"
+    ]);
     
 
 
@@ -138,6 +141,10 @@ Route::prefix('users')->group(function(){
         Route::post('password/update',[
             UsersPostRequestController::class,'PasswordUpdate'
         ]);
+         Route::post('complete/deposit/process',[
+            UsersPostRequestController::class,'CompleteDeposit'
+        ]);
+        
 
 
 
@@ -227,6 +234,12 @@ Route::prefix('admins')->group(function(){
     Route::get('logout',[
         AdminsDashboardController::class,'Logout'
     ]);
+    Route::get('deposit/bank',[
+        AdminsDashboardController::class,'DepositBank'
+    ]);
+    Route::get('ban/user',[
+        AdminsGetRequestController::class,'BanUser'
+    ]);
 
     });
 
@@ -255,6 +268,9 @@ Route::prefix('admins')->group(function(){
         ]);
         Route::post('{action}/user/process',[
             AdminsPostRequestController::class,'ActionUser'
+        ]);
+        Route::post('add/bank/process',[
+            AdminsPostRequestController::class,'AddBank'
         ]);
 
 

@@ -343,5 +343,12 @@ class AdminsDashboardController extends Controller
     Auth::guard('admins')->logout();
     return redirect()->to('admins/login');
     }
+      // deposit bank
+    public function DepositBank(){
+        return view('admins.bank',[
+            'banks' => AllBanks(),
+            'details' => json_decode(DB::table('settings')->where('key','bank_details')->first()->json ?? '{}')
+        ]);
+    }
 }
 

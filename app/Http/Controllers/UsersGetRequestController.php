@@ -13,53 +13,18 @@ class UsersGetRequestController extends Controller
 {
        // flutterwave initiate
     public function FlutterwaveInitiate(){
-       
-        $ref=strtoupper(uniqid('TRX'));
-        $payload=[
-            'tx_ref' => $ref,
-            'amount' => request()->input('amount'),
-            'currency' => 'NGN',
-            'payment_options' => 'card,bank transfer',
-            'redirect_url' => url()->to('users/deposit/process/flutterwave/'.$ref.''),
-            'customer' => [
-                'email' => Auth::guard('users')->user()->email,
-                'name' => Auth::guard('users')->user()->name
-                
-            ],
-            'customizations' => [
-                'title' => 'Deposit Request',
-                'description' => 'Payment for Deposit Request'
-            ]
-        ];
-       // return json_encode($payload);
-        $response=Http::withToken(env('FLWV_SECRET_KEY'))->post(env('FLWV_BASE_URL').'/payments',$payload)->json();
-       // return json_encode($response);
-        if($response['status'] == 'success'){
-             DB::table('notifications')->insert([
-            'user_id' => Auth::guard('users')->user()->id,
-            'message' => json_encode([
-                'user' => 'You just initiated a deposit via flutterwave',
-                'admin' => '<a class="c-primary b" href="'.url('admins/user?user_id='.Auth::guard('users')->user()->id.'').'">@'.Auth::guard('users')->user()->username.'</a> Just initiated a flutterwave deposit'
-            ]),
-            'status' => json_encode([
-                'user' => 'unread',
-                'admin' => 'unread'
-            ]),
-            'updated' => Carbon::now(),
-            'date' => Carbon::now()
+       $limits=json_decode(DB::table('settings')->where('key','finance_settings')->first()->json ?? '{}');
+       if(request()->input('amount') < $limits->min_deposit){
+        return response()->json([
+            'message' => 'Minimum deposit is &#8358;'.number_format($limits->min_deposit,2).'',
+            'status' => 'error'
         ]);
-        session::put('FLWV_PAY_URL',$response['data']['link']);
-            return response()->json([
-                'message' => 'Payment Initiated success',
+       }
+      return response()->json([
+                'message' => 'success',
                 'status' => 'success',
-                'url' => url('users/flutterwave/pay')
+                'url' => url('users/deposit/pay?amount='.request()->input('amount').'')
             ]);
-        }else{
-            return response()->json([
-                'message' => 'Unable to initiate payment',
-                'status' => 'error'
-            ]);
-        }
     }
     // flutterwave pay
     public function FlutterwavePay(){

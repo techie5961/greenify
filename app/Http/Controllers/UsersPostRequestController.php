@@ -67,6 +67,12 @@ class UsersPostRequestController extends Controller
             ]);
         }
         $select=DB::table('users')->where('username',request()->input('id'))->orWhere('email',request()->input('id'))->first();
+        if($select->status == 'banned'){
+              return response()->json([
+                'message' => 'Your account was banned,contact support',
+                'status' => 'error'
+            ]);
+        }
         if(Hash::check(request()->input('password'),$select->password)){
             Auth::guard('users')->loginUsingId($select->id);
             DB::table('logs')->insert([
@@ -180,6 +186,43 @@ class UsersPostRequestController extends Controller
             'url' => url()->to('users/profile')
         ]);
     }
+    //   complete deposit
+public function CompleteDeposit(){
+    DB::table('transactions')->insert([
+      'uniqid' => strtoupper(uniqid('TRX')),
+                'user_id' => Auth::guard('users')->user()->id,
+                'type' => 'deposit',
+                'class' => 'credit',
+                'amount' => request()->input('amount'),
+                'json' => json_encode([
+                    'gateway' => 'manual',
+                    'account_name' => request()->input('account_name'),
+                    'bank_name' => request()->input('bank_name'),
+                    
+                ]),
+                'status' => 'pending',
+                'updated' => Carbon::now(),
+                'date' => Carbon::now()
+            ]);
+              DB::table('notifications')->insert([
+            'user_id' => Auth::guard('users')->user()->id,
+            'message' => json_encode([
+                'user' => 'You just submitted a deposit request',
+                'admin' => '<a class="c-primary b" href="'.url('admins/user?user_id='.Auth::guard('users')->user()->id.'').'">@'.Auth::guard('users')->user()->username.'</a> Just submitted a deposit request'
+            ]),
+            'status' => json_encode([
+                'user' => 'unread',
+                'admin' => 'unread'
+            ]),
+            'updated' => Carbon::now(),
+            'date' => Carbon::now()
+        ]);
+            return response()->json([
+                'message' => 'Deposit submitted successfully',
+                'status' => 'success',
+                'url' => url('users/transactions')
+            ]);
+}
  
 }
 

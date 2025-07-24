@@ -214,4 +214,33 @@ class AdminsPostRequestController extends Controller
         ]);
       }
     }
+     // add bank
+    public function AddBank(){
+        $json=[
+            'account_number' => request()->input('account_number'),
+            'bank_code' => request()->input('bank_name'),
+            'account_name' => request()->input('account_name')
+        ];
+        if(DB::table('settings')->where('key','bank_details')->count() == 0){
+            DB::table('settings')->insert([
+                'key' => 'bank_details',
+                'json' => json_encode($json),
+                'date' => Carbon::now() 
+            ]);
+            return response()->json([
+                'message' => 'Bank details saved successfully',
+                'status' => 'success'
+            ]);
+        }else{
+  DB::table('settings')->where('key','bank_details')->update([
+                
+                'json' => json_encode($json),
+                'date' => Carbon::now() 
+            ]);
+            return response()->json([
+                'message' => 'Bank details updated successfully',
+                'status' => 'success'
+            ]);
+        }
+    }
 }

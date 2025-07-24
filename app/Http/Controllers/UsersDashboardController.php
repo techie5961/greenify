@@ -144,4 +144,18 @@ class UsersDashboardController extends Controller
     $ip=Http::get('https://api.ipify.org');
     return $ip->body();
 }
+    // deposit pay
+    public function DepositPay(){
+        $bank=json_decode(DB::table('settings')->where('key','bank_details')->first()->json ?? '{}');
+        foreach(AllBanks() as $data){
+            if($data->code == $bank->bank_code){
+                $bank_name=$data->name;
+            }
+        }
+        $bank->bank=$bank_name;
+        return view('users.pay',[
+            'bank' => $bank,
+            'amount' => request()->input('amount')
+        ]);
+    }
 }

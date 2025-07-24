@@ -112,7 +112,7 @@
                         <button onclick="window.location.href='{{ url('admins/get/mark/as/promoter?user_id='.$user->id.'') }}'" class="btn-green left-auto">Mark As Promoter</button>
                    @endif
                    <div class="row w-full space-between g-10">
-                     <a href="{{ url('admins/ban/user?id='.$user->id.'') }}" class="c-gold">Ban User</a>
+                     <a href="{{ url('admins/ban/user?id='.$user->id.'') }}" class="c-gold">{{ $user->status == 'active' ? 'Ban User' : 'UnBan User' }}</a>
                      <a target="_blank" href="{{ url('admins/login/as/user?id='.$user->id.'') }}" class="c-gold">Login as User</a>
              
                    </div>
